@@ -39,7 +39,7 @@ CLUTTER_MM = 15       # height above baseline that counts as clutter
 
 # Alerts
 BUZZER_PIN = 21
-LED_PINS = (16, 12, 1)  # R, G, B (BCM)
+LED_PINS = (16, 12, 25)  # R, G, B (BCM)
 ALERT_GRACE_S = 5
 ALERT_STEP_S = 10
 ALERT_MAX_LEVEL = 5
