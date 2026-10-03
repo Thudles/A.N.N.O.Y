@@ -8,6 +8,9 @@ while escalating beeps and lights nag until the floor is clear.
     python -m annoy.main --sim --seconds 40
 Simulates a sock under sensor 0 from t=5s to t=25s. Watch the alert level climb, then check `logs/run.csv`.
 
+Run the tests (no hardware or extra packages needed):
+    python -m unittest
+
 ## Hardware setup
 1. Enable I2C on the Pi (`sudo raspi-config`), `pip install -r requirements.txt`.
 2. PCA9685 boards at 0x40 and 0x41 (solder the A0 jumper on the second). Servo power from a 6V 10A+ buck, shared ground only with the Pi, and power the Pi from its own 5V supply.
