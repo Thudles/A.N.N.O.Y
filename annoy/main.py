@@ -4,7 +4,7 @@ import os
 import time
 from . import config as C
 from .kinematics import leg_ik
-from .gait import TripodGait
+from .gait import TripodGait, adapt
 from .sensors import ToFArray
 from .alerts import AlertStateMachine, AlertDriver
 from .robot import Hexapod
@@ -19,7 +19,7 @@ def run(sim, seconds, log_path):
     step = 0
     with open(log_path, "w", newline="") as f:
         log = csv.writer(f)
-        log.writerow(["t", "alert_level"] + [f"h{i}_mm" for i in range(6)])
+        log.writerow(["t", "alert_level", "blocked"] +[f"h{i}_mm" for i in range(6)])
         try:
             while True:
                 now = step * dt if sim else time.monotonic() - start
@@ -27,17 +27,15 @@ def run(sim, seconds, log_path):
                     break
                 heights = tof.heights_mm(now)
                 clutter = any(h >= C.CLUTTER_MM for h in heights)
-                # Adaptive gait: lift each foot above clutter near it, slow down when any is seen
-                lifts = [max(C.BASE_LIFT, h / 1000 + C.LIFT_MARGIN) if h >= C.CLUTTER_MM else C.BASE_LIFT
-                         for h in heights]
-                gait.period = C.BASE_PERIOD * (C.SLOW_FACTOR if clutter else 1.0)
-                gait.update(dt)
+                lifts, gait.period, blocked = adapt(heights)
+                if not blocked:  # too tall to step over: hold pose and let the alerts nag
+                    gait.update(dt)
                 for leg, target in enumerate(gait.foot_targets(lifts)):
                     robot.set_leg(leg, leg_ik(*target))
                 out = sm.update(clutter, now)
                 driver.apply(out, now)
                 if step % 5 == 0:
-                    log.writerow([f"{now:.2f}", out.level] + [f"{h:.1f}" for h in heights])
+                    log.writerow([f"{now:.2f}", out.level, int(blocked)] + [f"{h:.1f}" for h in heights])
                 step += 1
                 if not sim:
                     time.sleep(max(0.0, start + step * dt - time.monotonic()))

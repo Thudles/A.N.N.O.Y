@@ -14,9 +14,12 @@ class SimSmokeTest(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 run(sim=True, seconds=40, log_path=path)
             with open(path) as f:
-                levels = [int(r["alert_level"]) for r in csv.DictReader(f)]
+                rows = list(csv.DictReader(f))
+        levels = [int(r["alert_level"]) for r in rows]
         self.assertGreaterEqual(max(levels), 2)
         self.assertEqual(levels[-1], 0)
+        # The simulated sock is low enough to step over
+        self.assertFalse(any(int(r["blocked"]) for r in rows))
 
 
 if __name__ == "__main__":

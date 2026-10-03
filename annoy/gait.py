@@ -1,6 +1,20 @@
 import math
 from .config import (LEG_MOUNT_DEG, TRIPOD_A, REACH, STAND_HEIGHT,
-                     STRIDE, BASE_LIFT, BASE_PERIOD)
+                     STRIDE, BASE_LIFT, BASE_PERIOD, SLOW_FACTOR,
+                     LIFT_MARGIN, MAX_LIFT, CLUTTER_MM, MAX_STEP_MM)
+
+
+def adapt(heights_mm):
+    """Clutter heights -> (per-leg lifts, gait period, blocked).
+
+    Lift each foot above clutter near it, slow down when any is seen, and report
+    blocked when something is too tall to step over.
+    """
+    lifts = [min(MAX_LIFT, max(BASE_LIFT, h / 1000 + LIFT_MARGIN)) if h >= CLUTTER_MM else BASE_LIFT
+             for h in heights_mm]
+    clutter = any(h >= CLUTTER_MM for h in heights_mm)
+    blocked = any(h > MAX_STEP_MM for h in heights_mm)
+    return lifts, BASE_PERIOD * (SLOW_FACTOR if clutter else 1.0), blocked
 
 
 class TripodGait:

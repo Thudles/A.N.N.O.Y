@@ -30,7 +30,7 @@ class ToFArray:
         if self.sim:
             reading = 100.0 + random.gauss(0, 1.0)
             if i == 0 and 5.0 <= now <= 25.0:  # fake sock under sensor 0
-                reading -= 35.0
+                reading -= 25.0
             return reading
         return float(self.sensors[i].range)
 

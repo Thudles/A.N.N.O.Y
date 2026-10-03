@@ -26,3 +26,4 @@ Log trials per obstacle type (socks, shoe, book, cable, box, bag): detected, cle
 ## Known limits
 - ServoKit writes one channel per I2C call; if the 50 Hz loop lags, switch to PCA9685 auto-increment batch writes.
 - Gait is open loop and heads straight; no turning or body leveling yet.
+- Clutter taller than `MAX_STEP_MM` (derived from `MAX_LIFT` in `config.py`) stops the robot in place; it can't route around it yet.

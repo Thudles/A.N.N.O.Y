@@ -1,6 +1,30 @@
 import unittest
-from annoy.config import TRIPOD_A, TRIPOD_B, STAND_HEIGHT, BASE_PERIOD
-from annoy.gait import TripodGait
+from annoy.config import (TRIPOD_A, TRIPOD_B, STAND_HEIGHT, BASE_PERIOD, BASE_LIFT,
+                          MAX_LIFT, MAX_STEP_MM, LIFT_MARGIN, CLUTTER_MM)
+from annoy.gait import TripodGait, adapt
+
+
+class AdaptTest(unittest.TestCase):
+    def test_clear_floor(self):
+        lifts, period, blocked = adapt([0.0] * 6)
+        self.assertEqual(lifts, [BASE_LIFT] * 6)
+        self.assertEqual(period, BASE_PERIOD)
+        self.assertFalse(blocked)
+
+    def test_steps_over_low_clutter(self):
+        lifts, period, blocked = adapt([MAX_STEP_MM, 0, 0, 0, 0, 0])
+        self.assertAlmostEqual(lifts[0], MAX_STEP_MM / 1000 + LIFT_MARGIN)
+        self.assertEqual(lifts[1:], [BASE_LIFT] * 5)
+        self.assertGreater(period, BASE_PERIOD)
+        self.assertFalse(blocked)
+
+    def test_tall_clutter_blocks_and_lift_is_capped(self):
+        lifts, _, blocked = adapt([0, 0, 120.0, 0, 0, 0])
+        self.assertEqual(lifts[2], MAX_LIFT)
+        self.assertTrue(blocked)
+
+    def test_max_step_is_detectable(self):
+        self.assertGreater(MAX_STEP_MM, CLUTTER_MM)
 
 
 class TripodGaitTest(unittest.TestCase):

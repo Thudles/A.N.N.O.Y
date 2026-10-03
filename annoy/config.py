@@ -25,6 +25,8 @@ BASE_LIFT = 0.025
 BASE_PERIOD = 0.8     # seconds per full cycle
 SLOW_FACTOR = 1.6     # gait slows by this much near clutter
 LIFT_MARGIN = 0.02    # extra clearance above clutter height
+MAX_LIFT = 0.05       # keeps femur under +90 deg and feet below the belly; measure yours
+MAX_STEP_MM = (MAX_LIFT - LIFT_MARGIN) * 1000  # taller clutter blocks instead of being stepped over
 
 # Time-of-flight sensors (one per leg, mounted ahead of the foot, pointing down)
 XSHUT_PINS = [5, 6, 13, 19, 26, 20]  # BCM GPIO numbers, edit to match wiring
