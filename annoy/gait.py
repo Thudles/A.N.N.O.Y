@@ -24,6 +24,8 @@ class TripodGait:
         self.phase = 0.0
         self.period = BASE_PERIOD
         self.heading = (1.0, 0.0)  # unit vector in body frame
+        self._swing_lift = [BASE_LIFT] * 6
+        self._swinging = [False] * 6
 
     def update(self, dt):
         self.phase = (self.phase + dt / self.period) % 1.0
@@ -34,10 +36,18 @@ class TripodGait:
         for leg in range(6):
             local = (self.phase + (0.0 if leg in TRIPOD_A else 0.5)) % 1.0
             if local < 0.5:  # swing: foot moves forward, lifted
+                # Latch lift at lift-off so the foot doesn't jump; it may still rise for
+                # clutter seen mid-swing, but never drops onto it.
+                if self._swinging[leg]:
+                    self._swing_lift[leg] = max(self._swing_lift[leg], lifts[leg])
+                else:
+                    self._swing_lift[leg] = lifts[leg]
+                self._swinging[leg] = True
                 s = local / 0.5
                 fwd = -STRIDE / 2 + STRIDE * s
-                lift = lifts[leg] * math.sin(math.pi * s)
+                lift = self._swing_lift[leg] * math.sin(math.pi * s)
             else:            # stance: foot slides back on the floor
+                self._swinging[leg] = False
                 s = (local - 0.5) / 0.5
                 fwd = STRIDE / 2 - STRIDE * s
                 lift = 0.0

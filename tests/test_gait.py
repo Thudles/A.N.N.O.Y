@@ -1,3 +1,4 @@
+import math
 import unittest
 from annoy.config import (TRIPOD_A, TRIPOD_B, STAND_HEIGHT, BASE_PERIOD, BASE_LIFT,
                           MAX_LIFT, MAX_STEP_MM, LIFT_MARGIN, CLUTTER_MM)
@@ -36,6 +37,31 @@ class TripodGaitTest(unittest.TestCase):
             down = {leg for leg, (_, _, z) in enumerate(feet) if abs(z + STAND_HEIGHT) < 1e-9}
             # One full tripod is always on the floor
             self.assertTrue(set(TRIPOD_A) <= down or set(TRIPOD_B) <= down)
+
+    def _swing_z(self, gait, lifts):
+        gait.update(BASE_PERIOD / 20)
+        leg = TRIPOD_A[0]  # TRIPOD_A swings during the first half cycle
+        return gait.foot_targets(lifts)[leg][2] + STAND_HEIGHT
+
+    def test_lift_does_not_drop_mid_swing(self):
+        gait = TripodGait()
+        self._swing_z(gait, [MAX_LIFT] * 6)
+        z = self._swing_z(gait, [BASE_LIFT] * 6)  # clutter vanished mid-swing
+        self.assertAlmostEqual(z, MAX_LIFT * math.sin(math.pi * 0.2))
+
+    def test_lift_can_rise_mid_swing(self):
+        gait = TripodGait()
+        self._swing_z(gait, [BASE_LIFT] * 6)
+        z = self._swing_z(gait, [MAX_LIFT] * 6)
+        self.assertAlmostEqual(z, MAX_LIFT * math.sin(math.pi * 0.2))
+
+    def test_lift_relatches_on_next_swing(self):
+        gait = TripodGait()
+        self._swing_z(gait, [MAX_LIFT] * 6)
+        gait.update(BASE_PERIOD * 0.9)  # through stance, back to the start of the next swing
+        gait.foot_targets([BASE_LIFT] * 6)
+        z = self._swing_z(gait, [BASE_LIFT] * 6)
+        self.assertLess(z, MAX_LIFT * math.sin(math.pi * 0.2))
 
     def test_phase_wraps(self):
         gait = TripodGait()
