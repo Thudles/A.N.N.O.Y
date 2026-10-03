@@ -16,7 +16,7 @@ Run the tests (no hardware or extra packages needed):
 2. PCA9685 boards at 0x40 and 0x41 (solder the A0 jumper on the second). Servo power from a 6V 10A+ buck, shared ground only with the Pi, and power the Pi from its own 5V supply.
 3. Wire each VL53L0X XSHUT pin to the GPIOs in `config.py` (`XSHUT_PINS`); addresses are assigned at boot.
 4. Measure link lengths and set `COXA/FEMUR/TIBIA` in `config.py`.
-5. `python -m annoy.main --center`, attach horns at neutral, then create `calibration.json` with 18 `offsets` and 18 `signs` (+1 or -1) until each leg moves the right way. Bring up one leg at a time.
+5. `python -m annoy.main --center`, attach horns at neutral, then create `calibration.json` next to this README with 18 `offsets` and 18 `signs` (+1 or -1) until each leg moves the right way. Bring up one leg at a time.
 6. Run `python -m annoy.main` with the robot on a stand first.
 
 ## Testing for the resume claim

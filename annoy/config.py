@@ -1,4 +1,7 @@
 """All tunables in one place. Measure your own frame and edit these."""
+import os
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 LOOP_HZ = 50
 
@@ -17,7 +20,8 @@ TRIPOD_B = (1, 3, 5)
 # Board 0 at 0x40 (ch 0-15), board 1 at 0x41 (ch 16-31)
 PCA_ADDRESSES = (0x40, 0x41)
 PULSE_RANGE_US = (500, 2500)
-CALIBRATION_FILE = "calibration.json"  # {"offsets": [18 floats], "signs": [18 of +1/-1]}
+# {"offsets": [18 floats], "signs": [18 of +1/-1]}, next to README.md regardless of cwd
+CALIBRATION_FILE = os.path.join(_PROJECT_ROOT, "calibration.json")
 
 # Gait
 STRIDE = 0.05

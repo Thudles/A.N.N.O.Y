@@ -19,7 +19,7 @@ def run(sim, seconds, log_path):
     step = 0
     with open(log_path, "w", newline="") as f:
         log = csv.writer(f)
-        log.writerow(["t", "alert_level", "blocked"] +[f"h{i}_mm" for i in range(6)])
+        log.writerow(["t", "alert_level", "blocked"] + [f"h{i}_mm" for i in range(6)])
         try:
             while True:
                 now = step * dt if sim else time.monotonic() - start
@@ -41,6 +41,9 @@ def run(sim, seconds, log_path):
                     time.sleep(max(0.0, start + step * dt - time.monotonic()))
         finally:
             driver.off()
+            clamped = {ch: n for ch, n in enumerate(robot.clamp_counts) if n}
+            if clamped:
+                print(f"warning: servo angles clamped to 0-180 (channel: count) {clamped}")
 
 
 def main():
