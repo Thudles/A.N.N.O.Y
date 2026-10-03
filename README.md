@@ -1,4 +1,4 @@
-# ANNOY: Autonomous Nagging Navigator Observing Your clutter
+# A.N.N.O.Y: Autonomous Nagging Navigator Observing Your clutter
 
 Python hexapod for a Raspberry Pi. Two PCA9685 boards drive 18 servos, six VL53L0X
 sensors point down ahead of each foot, and an adaptive tripod gait steps over clutter
